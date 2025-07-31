@@ -8,15 +8,32 @@ from rdkit import Chem
 import torch
 import dgl
 import pickle
-import time
+import os
 
-with open('model_data/transforms', 'rb') as f:
-    transforms = pickle.load(f)
+# Rutas candidatas para transforms
+paths = ['model_data/transforms', 'deepbde/model_data/transforms']
 
-out_mean, out_stdev = transforms['val_mean'], transforms['val_stdev']
+# Buscar y cargar transforms
+for path in paths:
+    try:
+        with open(path, 'rb') as f:
+            transforms = pickle.load(f)
+        # Obtener el directorio base para usarlo como raíz del modelo
+        base_dir = os.path.dirname(path)
+        break
+    except FileNotFoundError:
+        continue
+else:
+    raise FileNotFoundError(f"No se encontró el archivo 'transforms' en ninguna de las rutas: {paths}")
+
+# Extraer datos del diccionario
+out_mean = transforms['val_mean']
+out_stdev = transforms['val_stdev']
 stders = transforms['transform']
 
-model_path = 'model_data/model'
+# Definir ruta del modelo relativo al transforms cargado
+model_path = os.path.join(base_dir, 'model')
+
 model = torch.load(model_path, map_location='cpu')
 model.eval()
 
