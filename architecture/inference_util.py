@@ -1,3 +1,5 @@
+import warnings
+warnings.filterwarnings("ignore", category=FutureWarning)
 from architecture.data.rxn_graph import BondDissociate
 from architecture.data.initial_containers import DGLwBDEMappings
 from architecture.data.single_run_tools import prod_to_reac_atom_map, prod_to_reac_bond_map
